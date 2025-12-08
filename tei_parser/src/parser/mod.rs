@@ -1,5 +1,6 @@
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Header {
@@ -77,6 +78,16 @@ impl TryFrom<&str> for UnflattenEntry {
             .trim()
             .to_string();
         Ok(UnflattenEntry { header, body })
+    }
+}
+
+impl Display for Entry {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.body.starts_with(",") || self.body.starts_with(";") || self.body.starts_with(" ") {
+            write!(f, "{}{}", self.entry, self.body)
+        } else {
+            write!(f, "{} {}", self.entry, self.body)
+        }
     }
 }
 
