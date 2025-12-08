@@ -47,10 +47,10 @@ fn main() {
         },
         None => match args.random {
             true => {
-                let data_path = Path::new("../assets/db");
-                let data = fs::read(data_path).unwrap();
+                let archive = NamedArchive::load(include_dir!("../assets"));
+                let db = archive.get("db").unwrap();
                 let config = bincode::config::standard();
-                let entries: Entries = bincode::serde::decode_from_slice(&data, config).unwrap().0;
+                let entries: Entries = bincode::serde::decode_from_slice(db, config).unwrap().0;
                 let mut keys: Vec<&String> = entries.0.keys().collect();
                 let mut rng = rand::rng();
                 keys.shuffle(&mut rng);
@@ -65,7 +65,6 @@ fn main() {
 
     let archive = NamedArchive::load(include_dir!("../assets"));
     let db = archive.get("db").unwrap();
-
     let config = bincode::config::standard();
     let entries: Entries = bincode::serde::decode_from_slice(db, config).unwrap().0;
     match query(input_str.clone(), &entries) {

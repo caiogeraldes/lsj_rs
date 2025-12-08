@@ -7,6 +7,7 @@ description = "A rust CLI for querying the LSJ"
 license = "MIT"
 repository = "https://github.com/caiogeraldes/lsj-rs"
 readme = "README.md"
+include = ["../assets/db"]
 
 [dependencies]
 betacode = "1.2.0"
