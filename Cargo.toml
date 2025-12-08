@@ -1,4 +1,4 @@
-
 [workspace]
 resolver = "1"
-members = ["cli","tei_parser"]
+members = ["cli", "db_builder", "tei_parser"]
+default-members = ["cli", "tei_parser"]
