@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 betacode = "1.2.0"
-include_assets = "1.0.0"
+log = "0.4.29"
 quick-xml = { version = "0.38.4", features = ["serde"] }
 regex = "1.12.2"
 serde = { version = "1.0.228", features = ["derive"] }
