@@ -8,20 +8,20 @@ pub(crate) struct Header {
     #[serde(rename = "@key")]
     key: String,
     #[serde(rename = "@orig_id")]
-    orig_id: String,
+    orig_id: Option<String>,
     #[serde(rename = "@type")]
-    etype: String,
+    etype: Option<String>,
     #[serde(rename = "@opt")]
-    opt: String,
+    opt: Option<String>,
     head: Head,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub(crate) struct Head {
     #[serde(rename = "@extent")]
-    extent: String,
+    extent: Option<String>,
     #[serde(rename = "@orth_orig")]
-    original_orthography: String,
+    original_orthography: Option<String>,
     #[serde(rename = "#text")]
     value: Option<String>,
 }
@@ -34,9 +34,9 @@ pub(crate) struct UnflattenEntry {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Entry {
-    key: String,
-    entry: String,
-    body: String,
+    pub key: String,
+    pub entry: String,
+    pub body: String,
 }
 
 impl From<UnflattenEntry> for Entry {
@@ -48,8 +48,8 @@ impl From<UnflattenEntry> for Entry {
 
         Entry {
             key: value.header.key,
-            entry: entry,
-            body: value.body,
+            entry: entry.trim().to_string(),
+            body: value.body.trim().to_string(),
         }
     }
 }
@@ -58,8 +58,12 @@ impl TryFrom<&str> for UnflattenEntry {
     type Error = crate::error::Error;
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         let split: Vec<&str> = value.trim().split("</head>").collect();
-        let header: Header =
-            serde_xml_rs::from_str(&format!("{0}</head></div2>", split[0])).unwrap();
+        let header: Header = match serde_xml_rs::from_str(&format!("{0}</head></div2>", split[0])) {
+            Ok(value) => value,
+            Err(_) => {
+                return Err(crate::error::Error::ParsingError(split[0].into()));
+            }
+        };
         let re = Regex::new("<.*?>").unwrap();
         let dirty_body = split[1];
         let clean_body = re.replace_all(dirty_body, "");
@@ -89,7 +93,7 @@ pub fn parse_tei(tei: &str) -> Vec<Entry> {
         match TryInto::<UnflattenEntry>::try_into(m.as_str()) {
             Ok(entry) => entries.push(entry.into()),
             Err(_e) => {
-                dbg!(m);
+                warn!("{}", m.as_str());
             }
         }
     }
