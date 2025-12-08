@@ -6,7 +6,7 @@ extern crate bincode;
 extern crate pretty_env_logger;
 use include_assets::{NamedArchive, include_dir};
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fs, path::Path};
+use std::collections::HashMap;
 use tei_parser::parser::Entry;
 
 #[derive(Parser, Debug)]

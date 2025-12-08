@@ -83,10 +83,12 @@ impl TryFrom<&str> for UnflattenEntry {
 
 impl Display for Entry {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        if self.body.starts_with(",") || self.body.starts_with(";") || self.body.starts_with(" ") {
-            write!(f, "{}{}", self.entry, self.body)
+        let re = Regex::new("  ").unwrap();
+        let body: String = re.replace_all(&self.body, " ").into();
+        if body.starts_with(",") || body.starts_with(";") || body.starts_with(" ") {
+            write!(f, "{}{}", self.entry, body)
         } else {
-            write!(f, "{} {}", self.entry, self.body)
+            write!(f, "{} {}", self.entry, body)
         }
     }
 }
