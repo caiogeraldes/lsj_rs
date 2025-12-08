@@ -2,6 +2,11 @@
 name = "tei-parser"
 version = "0.1.0"
 edition = "2024"
+authors = ["Caio Geraldes <caio.geraldes@usp.br>"]
+description = "A rust lib for parsing the Logeion LSJ"
+license = "MIT"
+repository = "https://github.com/caiogeraldes/lsj-rs"
+readme = "README.md"
 
 [dependencies]
 betacode = "1.2.0"
