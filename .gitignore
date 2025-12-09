@@ -1,3 +1,4 @@
 /target
 .cargo/
 .rustup/
+.wix314-binaries/
