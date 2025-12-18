@@ -1,6 +1,6 @@
 [package]
 name = "tei-parser"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["Caio Geraldes <caio.geraldes@usp.br>"]
 description = "A rust lib for parsing the Logeion LSJ"

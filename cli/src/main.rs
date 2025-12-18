@@ -9,6 +9,8 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use tei_parser::parser::Entry;
 
+mod query;
+
 #[derive(Parser, Debug)]
 #[clap(author, version, about, long_about = None)]
 pub struct Args {
@@ -25,15 +27,10 @@ pub struct Args {
 }
 
 #[derive(Deserialize, Serialize)]
-struct Entries(HashMap<String, Entry>);
-
-fn query(value: String, entries: &Entries) -> Option<&Entry> {
-    entries.0.get(&value)
-}
+pub(crate) struct Entries(HashMap<String, Entry>);
 
 fn main() {
     pretty_env_logger::init();
-
     let args = Args::parse();
 
     if args.random && args.text.is_some() {
@@ -67,9 +64,25 @@ fn main() {
     let db = archive.get("db").unwrap();
     let config = bincode::config::standard();
     let entries: Entries = bincode::serde::decode_from_slice(db, config).unwrap().0;
-    match query(input_str.clone(), &entries) {
+    match query::query(input_str.clone(), &entries) {
         Some(entry) => println!("{}", entry),
-        None => eprintln!("Entry \"{}\" not found", input_str),
+        None => {
+            warn!("Trying without diacritics");
+            let db_no_dia = archive.get("db_no_dia").unwrap();
+            let entries: Entries = bincode::serde::decode_from_slice(db_no_dia, config)
+                .unwrap()
+                .0;
+            match query::query_no_diacritics(input_str.clone(), &entries) {
+                Some(entry) => println!("{}", entry),
+                None => {
+                    for entry in entries.0.keys() {
+                        println!("{}",entry);
+                    }
+                    eprintln!("Entry \"{}\" not found", input_str);
+                    std::process::exit(1)
+                }
+            }
+        }
     }
     std::process::exit(0);
 }

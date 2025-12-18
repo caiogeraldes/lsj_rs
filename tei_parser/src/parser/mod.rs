@@ -33,7 +33,7 @@ pub(crate) struct UnflattenEntry {
     body: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Entry {
     pub key: String,
     pub entry: String,

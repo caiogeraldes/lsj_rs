@@ -19,6 +19,7 @@ impl Entries {
 fn main() {
     pretty_env_logger::init();
     let mut entries: HashMap<String, Entry> = HashMap::new();
+    let mut entries_no_dia: HashMap<String, Entry> = HashMap::new();
     for f in fs::read_dir("../assets/lsjlogeion").unwrap() {
         match f {
             Ok(f) => {
@@ -28,7 +29,30 @@ fn main() {
                     info!("Parsing {:?}", f.path());
                     let tei_file = fs::read_to_string(f.path()).unwrap();
                     for entry in parse_tei(&tei_file) {
-                        entries.insert(entry.key.clone(), entry);
+                        let key = entry
+                            .key
+                            .replace("+", "")
+                            .replace("_", "")
+                            .replace("^", "")
+                            .clone();
+                        let key_no_dia = key
+                            .clone()
+                            .replace("\\", "")
+                            .replace("/", "")
+                            .replace(")", "")
+                            .replace("(", "")
+                            .replace("'", "")
+                            .replace("*", "")
+                            .replace("-", "")
+                            .replace("[", "")
+                            .replace("]", "")
+                            .replace("<", "")
+                            .replace(">", "")
+                            .replace("|", "")
+                            .replace("-", "")
+                            .replace("=", "");
+                        entries.insert(key, entry.clone());
+                        entries_no_dia.insert(key_no_dia, entry.clone());
                     }
                 }
             }
@@ -41,6 +65,18 @@ fn main() {
     let output_file_path = Path::new("../assets/db");
     let mut output_file = fs::File::create_new(output_file_path).unwrap();
     match bincode::serde::encode_into_std_write(Entries::new(entries), &mut output_file, config) {
+        Ok(e) => {
+            info!("wrote {} bytes at {:?}", e, output_file_path);
+        }
+        Err(e) => panic!("{}", e),
+    }
+    let output_file_path = Path::new("../assets/db_no_dia");
+    let mut output_file = fs::File::create_new(output_file_path).unwrap();
+    match bincode::serde::encode_into_std_write(
+        Entries::new(entries_no_dia),
+        &mut output_file,
+        config,
+    ) {
         Ok(e) => {
             info!("wrote {} bytes at {:?}", e, output_file_path);
         }
